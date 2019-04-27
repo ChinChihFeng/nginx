@@ -1,0 +1,26 @@
+---
+- name: Check the directory which it saves ssl files is existence or not
+  stat:
+    path: "{{ nginx_ssl_path }}"
+  register: ch_ssl
+  tags:
+    - package
+
+- name: Create a directory to reserve all certifications if it is not existence
+  file:
+    path: "{{ nginx_ssl_path }}"
+    owner: root
+    group: root
+    state: directory
+    mode: 0755
+  when: ch_ssl.stat.exists == False
+  tags:
+    - package
+
+- name: Generate ssl session ticket and DH file for DHE ciphers.
+  shell: |
+    openssl rand 80 > {{ nginx_ssl_path }}/ticket.key
+    openssl dhparam -outform pem -out {{ nginx_ssl_path }}/dhparam2048.pem 2048
+  tags:
+    - package
+

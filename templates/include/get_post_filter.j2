@@ -1,0 +1,5 @@
+# Only allow GET, HEAD POST request methods.
+if ($request_method !~ ^(GET|HEAD|POST)$ ) {
+	return 444; # Return error code 444 -   "Server will close the connection using a tcp reset with the client without sending any headers."
+}
+

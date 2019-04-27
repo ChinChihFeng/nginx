@@ -1,0 +1,59 @@
+location /nws_health/ {
+
+            # cd /usr/local/nginx/
+            # htpasswd -c /etc/nginx/.htpasswd nwshcadmin
+            auth_basic "Restricted";
+            auth_basic_user_file .htpasswd;
+
+            location /nws_health/00x1 {
+                vhost_traffic_status_display;
+                vhost_traffic_status_display_format json;
+		#access_log off;
+            }
+
+            location /nws_health/00x2 {
+                default_type 'text/html';
+                content_by_lua '
+                    local statsf = "/var/cache/nginx/statsfile"
+                    file = io.open(statsf, "r")
+                    if file==nil
+                        then
+                            ngx.say(log_path .. " can\'t read or does not exists")
+                            return
+                     end
+
+                    local content = file:read("*all")
+                    file:close()
+                    ngx.say(content)
+                ';
+            }
+
+            location /nws_health/00x3 {
+                default_type 'text/html';
+                content_by_lua '
+                    local statsf = "/tmp/tsar_output"
+                    file = io.open(statsf, "r")
+                    if file==nil
+                        then
+                            ngx.say(log_path .. " can\'t read or does not exists")
+                            return
+                     end
+
+                    local content = file:read("*all")
+                    file:close()
+                    ngx.say(content)
+                ';
+            }
+
+            location /nws_health/stats {
+                default_type 'text/html';
+                alias stats_viewer_html/stats.html;
+            }
+
+
+            location /nws_health/upstream {
+                check_status;
+            }
+
+}
+

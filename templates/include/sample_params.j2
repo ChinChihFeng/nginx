@@ -1,0 +1,149 @@
+  #proxy_hide_header      Set-Cookie;
+        #proxy_ignore_headers   Set-Cookie;
+
+        # Allow client to bypass cache by explicitly requesting a fresh, non-cached version of the resource.
+        #proxy_cache_bypass $http_cache_control;
+
+        # Forbids the reverse cache proxy from caching requests that have a PHPSESSID cookie
+        #proxy_no_cache $cookie_PHPSESSID;
+
+        # Instructs the proxy to bypass the cache and forwards the request to the backend if the incoming request contains a PHPSESSID cookie.
+        #proxy_cache_bypass $cookie_PHPSESSID;
+
+        # Default just for testing
+        #location / {
+        #    root   html;
+        #    index  index.html index.htm;
+        #}
+
+ # Micro-caching setup for heavily requested dynamic content, not bound to any users
+        #location /microcache_loc {
+
+        #    # Setup var defaults
+        #    set $no_cache "";
+        #    # If non GET, don't cache & mark user as uncacheable for 1 second via cookie
+        #    if ($request_method !~ ^(GET|HEAD)$) {
+        #        set $no_cache "1";
+        #    }
+
+        #    # Drop no cache cookie if need be # (for some reason, add_header fails if included in prior if-block)
+        #    if ($no_cache = "1") {
+        #        add_header Set-Cookie "_mcnc=1; Max-Age=2; Path=/";
+        #        add_header X-Microcachable "0";
+        #    }
+
+        #    # Bypass cache if no-cache cookie is set
+        #    if ($http_cookie ~* "_mcnc") {
+        #        set $no_cache "1";
+        #    }
+
+        #    # Bypass cache if flag is set
+        #    proxy_no_cache $no_cache;
+        #    proxy_cache_bypass $no_cache;
+
+        #    # Point nginx to the real app/web server
+        #    proxy_pass http://app1;
+
+        #    # Set cache zone
+        #    proxy_cache microcache;
+
+        #    # Set cache key to include identifying components
+        #    proxy_cache_key $scheme$host$request_method$request_uri;
+
+        #    # Number of hits before allowing caching
+        #    proxy_cache_min_uses 1;
+
+        #    # Only cache valid HTTP 200 responses for 1 second
+        #    proxy_cache_valid 200 1s;
+        #    proxy_cache_valid 301 1s;
+        #    proxy_cache_valid any 1s;
+
+        #    # Serve from cache if currently refreshing
+        #    proxy_cache_use_stale updating;
+
+        #    # Send appropriate headers through
+        #    proxy_set_header X-Real-IP $remote_addr;
+        #    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+        #    # Set files larger than 1M to stream rather than cache
+        #    proxy_max_temp_file_size 1M;
+        #}
+
+        # Let the Set-Cookie header through.
+        #proxy_pass_header Set-Cookie;
+        # It could happen that the Set-Cookie header with our session cookie would end up in the cache and so every user would be logged in as the user that was logging in when the response was cached
+        #proxy_ignore_headers Set-Cookie;
+        #proxy_hide_header Set-Cookie;
+
+        #location ~* .+\.(ico|jpg|gif|jpeg|css|js|flv|png|swf)$ {
+        #    expires 1d;
+        #    proxy_cache webcache;
+        #    proxy_cache_key $host$request_uri";
+        #    proxy_cache_valid 200 304 15m;
+        #    proxy_cache_valid 302 301 15m;
+        #    proxy_cache_valid any 1m;
+        #    proxy_cache_min_uses 1;
+        #    proxy_pass http://app1;
+        #}
+
+
+
+   # redirect -- for example, perhaps we do not host that
+        #location /forum/ {
+        #     rewrite  ^/(.*)$  http://new_loaction.somedomain.com/forum/ permanent;
+        #}
+
+            # Do not cache any requests using our cgi paths. The http_my_secret_header is not used and is just a place holder if you need this function.
+            #location ~* (/cgi/||/authorized/|/restrict/) {
+        #     expires epoch;
+        #     proxy_no_cache 1;
+        #     proxy_cache_bypass $http_my_secret_header;
+        #     proxy_pass http://backend_web_servers;
+        #}
+
+            #location /nx_status {
+        #    stub_status on;
+        #    access_log   off;
+        #    allow 127.0.0.1;
+        #    deny all;
+        #}
+
+        # Don't cache these pages.
+        #location ~* ^/(wp-admin|wp-login.php)
+        #{
+        #    proxy_pass http://backend;
+        #}
+
+        # Catch the wordpress cookies.
+        # Must be set to blank first for when they don't exist.
+        #set $wordpress_auth "";
+        #if ($http_cookie ~* "wordpress_logged_in_[^=]*=([^%]+)%7C") {
+        #    set $wordpress_auth wordpress_logged_in_$1;
+        #}
+        # 2 rules to dedicate the no caching rule for logged in users.
+        #    proxy_cache_bypass $wordpress_auth; # Do not cache the response.
+        #    proxy_no_cache $wordpress_auth; # Do not serve response from cache.
+
+
+        ## Forcing Web Browsers to Cache CSS , JS , etc
+        #location ~ (.js$|.css$|.gif$|.woff$|.ttf$|.eot$|^/images/|^/icons/) {
+        #    add_header Cache-Control public; expires 7d;
+        #}
+
+        ## Below is an example block of configurations which utilizes the Nginx pagespeed module
+        # http {
+        #    pagespeed on;
+        #    pagespeed FileCachePath /var/ngx_pagespeed_cache;
+        #    pagespeed EnableFilters combine_css,combine_javascript,rewrite_javascript;
+        #}
+
+
+        # Redirect other domains, including www.domain.com (for enabling HSTS)
+        #server {
+        #  listen 80;
+        #  index index.html index.htm;
+        #  server_name *.domain.com *.other-domain.com;
+        #  add_header "Cache-Control" "public, max-age=31536000";
+        #  return 301 https://domain.com;
+        #}
+

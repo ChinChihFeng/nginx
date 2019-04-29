@@ -108,9 +108,6 @@
 
 - include: system.yml
 
-#- name: Initialize the environment to prepare start Nginx
-#  shell: ./nginx_sample_init.sh chdir=/tmp/nginx
-
 - name: Copy init file to destination
   template: 
     src: nginx.service 

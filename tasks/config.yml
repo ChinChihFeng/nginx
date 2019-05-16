@@ -97,7 +97,7 @@
     fstype: tmpfs
     opts: "defaults,size={{ nginx_cache_size }}"
     state: mounted
-  when: ansible_virtualization_type != docker
+  when: ansible_virtualization_type != 'docker'
   tags:
     - package
     - config

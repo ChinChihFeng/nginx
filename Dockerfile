@@ -13,12 +13,7 @@ RUN yum -y install git && \
 
 WORKDIR /tmp
 
-RUN git clone https://github.com/ChinChihFeng/nginx.git; \
+RUN git clone -b develop https://github.com/ChinChihFeng/nginx.git; \
     ansible-playbook /tmp/nginx/tests/test.yml --syntax-check; \
     ansible all -m setup -i /tmp/nginx/tests/inventory; \
     ansible-playbook /tmp/nginx/tests/test.yml
-
-
-    
-
-

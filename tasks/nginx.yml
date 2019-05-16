@@ -118,18 +118,18 @@
   tags:
     - package
 
-- name: Reload systemd daemon
-  systemd:
-    state: restarted
-    daemon_reload: yes
-    name: nginx
-  tags:
-    - package
-
-- name: Be sure nginx is running and enabled
-  systemd: 
-    name: nginx
-    state: started
-    enabled: yes
-  tags:
-    - package
+#- name: Reload systemd daemon
+#  systemd:
+#    state: restarted
+#    daemon_reload: yes
+#    name: nginx
+#  tags:
+#    - package
+#
+#- name: Be sure nginx is running and enabled
+#  systemd: 
+#    name: nginx
+#    state: started
+#    enabled: yes
+#  tags:
+#    - package

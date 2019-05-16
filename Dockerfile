@@ -8,7 +8,7 @@ LABEL Component="nginx" \
 RUN yum -y install git && \
     yum -y update && \
     yum clean all
-    
+
 # Start to compile nginx by Ansible
 
 WORKDIR /tmp

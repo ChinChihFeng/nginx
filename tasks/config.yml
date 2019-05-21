@@ -72,14 +72,14 @@
     - package
     - config
 
-- name: Copy a default configuration to conf directory
-  copy:
-    src: example.conf
-    dest: "{{ nginx_path }}/conf.d"
-    mode: 0644
-  tags:
-    - package
-    - config
+#- name: Copy a default configuration to conf directory
+#  copy:
+#    src: example.conf
+#    dest: "{{ nginx_path }}/conf.d"
+#    mode: 0644
+#  tags:
+#    - package
+#    - config
 
 - name: Check the directory which it saves files of caching is existence or not
   stat:

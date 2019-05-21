@@ -15,12 +15,12 @@ RUN sed -i -e 's/^\(Defaults\s*requiretty\)/#--- \1/'  /etc/sudoers
 RUN echo -e '[local]\nlocalhost ansible_connection=local' > /etc/ansible/hosts
 
 # Start to compile nginx by Ansible
-RUN git clone -b develop https://github.com/ChinChihFeng/nginx.git /etc/ansible/roles/nginx && \
-    ansible-playbook /etc/ansible/roles/nginx/tests/test.yml --syntax-check && \
+RUN git clone -b develop https://github.com/ChinChihFeng/nginx.git /etc/ansible/roles/nginx; \
+    ansible-playbook /etc/ansible/roles/nginx/tests/test.yml --syntax-check; \
     ansible all -m setup -i /etc/ansible/roles/nginx/tests/inventory; \
     ansible-playbook /etc/ansible/roles/nginx/tests/test.yml
 
-RUN ln -s /usr/local/nginx/conf.d/example.conf /usr/local/nginx/sites-enabled
+#RUN ln -s /usr/local/nginx/conf.d/example.conf /usr/local/nginx/sites-enabled
 
 EXPOSE 80
 

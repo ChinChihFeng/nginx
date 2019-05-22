@@ -22,6 +22,9 @@ RUN git clone -b develop https://github.com/ChinChihFeng/nginx.git /etc/ansible/
 
 RUN ln -s /usr/local/nginx/conf.d/example.conf /usr/local/nginx/sites-enabled
 
+RUN ln -sf /dev/stdout /usr/local/nginx/logs/access.log \
+	&& ln -sf /dev/stderr /usr/local/nginx/logs/error.log
+
 EXPOSE 80
 
 STOPSIGNAL SIGTERM

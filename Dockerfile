@@ -20,7 +20,7 @@ RUN git clone -b develop https://github.com/ChinChihFeng/nginx.git /etc/ansible/
     ansible all -m setup -i /etc/ansible/roles/nginx/tests/inventory; \
     ansible-playbook /etc/ansible/roles/nginx/tests/test.yml
 
-RUN ln -s /usr/local/nginx/conf.d/example.conf /usr/local/nginx/sites-enabled
+#RUN ln -s /usr/local/nginx/conf.d/example.conf /usr/local/nginx/sites-enabled
 
 RUN ln -sf /dev/stdout /usr/local/nginx/logs/access.log \
 	&& ln -sf /dev/stderr /usr/local/nginx/logs/error.log

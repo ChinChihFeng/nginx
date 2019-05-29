@@ -1,0 +1,135 @@
+---
+- name: Check the existence of directory or not 
+  stat:
+    path: "{{ nginx_temp_installation }}"
+  register: nti
+  tags:
+    - package
+
+- fail:
+    msg: "The directory has already exist!"
+  when: nti.stat.isdir is defined
+  tags:
+    - package
+
+- name: Create the temp directory
+  file:
+    path: "{{ nginx_temp_installation }}"
+    state: directory
+  when: nti.stat.isdir is not defined
+  tags:
+    - package
+
+- name: Install packages for preparation
+  yum: 
+    name: "{{ default_packages }}"
+    state: latest
+  tags:
+    - package
+
+- include: packages.yml
+
+- name: Download the distribution from the website
+  get_url:
+    url: https://nginx.org/download/nginx-{{ nginx_main_version }}.tar.gz
+    dest: "{{ nginx_temp_installation }}/nginx-{{ nginx_main_version }}.tar.gz"
+    mode: 0755
+  tags:
+    - package
+
+- name: Unarchive nginx
+  unarchive:
+    src: "{{ nginx_temp_installation }}/nginx-{{ nginx_main_version }}.tar.gz"
+    dest: "{{ nginx_temp_installation }}"
+    remote_src: yes
+  tags:
+    - package
+
+- include: patch.yml
+
+- name: Setting nginx parameters
+  shell: |
+    export CFLAGS="-Wno-error"
+    export CXXFLAGS="-Wno-error"
+    export LUAJIT_LIB={{ LuaJIT_path }}/lib
+    export LUAJIT_INC={{ LuaJIT_path }}/include/luajit-{{ LuaJIT_version | regex_replace('^(\d+\.)?(\d+)-?(\*|\d+)$', '\1\2') }}
+    ./configure --sbin-path={{ nginx_path }}/nginx \
+                --conf-path={{ nginx_path }}/nginx.conf \
+                --pid-path={{ nginx_path }}/nginx.pid \
+                --with-pcre={{ nginx_temp_installation }}/pcre-{{ pcre_version }} \
+                --with-zlib={{ nginx_temp_installation }}/zlib-{{ cloudflare_zlib_version }} \
+                --with-openssl={{ nginx_temp_installation }}/openssl-{{ openssl_version }} \
+                --with-ld-opt="-Wl,-rpath,$LUAJIT_LIB" \
+                --with-pcre-jit \
+                --with-http_geoip_module \
+                --with-http_stub_status_module \
+                --with-http_gzip_static_module \
+                --with-http_secure_link_module \
+                --with-http_realip_module \
+                --with-file-aio \
+                --with-ipv6 \
+                --with-http_ssl_module \
+                --with-http_v2_module \
+                --without-http_browser_module \
+                --without-http_fastcgi_module \
+                --without-http_autoindex_module \
+                --without-http_scgi_module \
+                --add-module={{ nginx_temp_installation }}/ngx_devel_kit-{{ ndk_version }} \
+                --add-module={{ nginx_temp_installation }}/lua-nginx-module-{{ lua_ngx_version }} \
+                --add-module={{ nginx_temp_installation }}/nginx_upstream_check_module \
+                --add-module={{ nginx_temp_installation }}/nginx-upstream-fair \
+                --add-module="{{ nginx_temp_installation }}/nginx-upstream-jvm-route" \
+                --add-module={{ nginx_temp_installation }}/headers-more-nginx-module-{{ headers_more_version }} \
+                --add-module={{ nginx_temp_installation }}/nginx-module-vts-{{ vts_version }} \
+                --add-module={{ nginx_temp_installation }}/testcookie-nginx-module \
+                --add-module={{ item.path }}
+  args:
+    chdir: "{{ nginx_temp_installation }}/nginx-{{ nginx_main_version }}"
+  with_items: "{{ find_sticky.files }}"
+  tags:
+    - package
+
+- name: Compile nginx from source
+  shell: |
+    make -j
+    make install
+  args:
+    chdir: "{{ nginx_temp_installation }}/nginx-{{ nginx_main_version }}"
+  tags:
+    - package
+
+- include: waf.yml
+
+- include: ssl.yml
+
+- include: config.yml
+
+#- include: geoip.yml
+
+- include: system.yml
+
+- name: Copy init file to destination
+  template: 
+    src: nginx.service 
+    dest: /etc/systemd/system/
+    owner: root 
+    group: root
+    mode: 755
+  tags:
+    - package
+
+#- name: Reload systemd daemon
+#  systemd:
+#    state: restarted
+#    daemon_reload: yes
+#    name: nginx
+#  tags:
+#    - package
+#
+#- name: Be sure nginx is running and enabled
+#  systemd: 
+#    name: nginx
+#    state: started
+#    enabled: yes
+#  tags:
+#    - package

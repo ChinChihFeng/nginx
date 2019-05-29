@@ -1,0 +1,71 @@
+---
+- name: Download upstream check patch
+  git:
+    repo: https://github.com/yaoweibin/nginx_upstream_check_module.git
+    dest: "{{ nginx_temp_installation }}/nginx_upstream_check_module"
+  tags:
+    - package
+
+- name: apply patch of upstream checking to the source code of nginx
+  patch:
+    src: "{{ nginx_temp_installation }}/nginx_upstream_check_module/check_1.12.1+.patch"
+    basedir: "{{ nginx_temp_installation }}/nginx-{{ nginx_main_version }}"
+    strip: 1
+    remote_src: yes
+  tags:
+    - package
+
+- name: Download upstream fair patch
+  git:
+    repo: https://github.com/itoffshore/nginx-upstream-fair
+    dest: "{{ nginx_temp_installation }}/nginx-upstream-fair"
+  tags:
+    - package
+
+- name: Download upstream jvm route patch
+  git:
+    repo: https://github.com/nulab/nginx-upstream-jvm-route.git
+    dest: "{{ nginx_temp_installation }}/nginx-upstream-jvm-route"
+  tags:
+    - package
+
+#- name: Download upstream jvm route patch
+#  get_url:
+#    url: https://github.com/nulab/nginx-upstream-jvm-route/archive/v1.12.0.tar.gz
+#    dest: "{{ nginx_temp_installation }}/nginx-upstream-jvm-route.tar.gz"
+#    mode: 0755
+#  tags:
+#    - package
+
+#- name: Unarchive upstream jvm package
+#  unarchive:
+#    src: "{{ nginx_temp_installation }}/nginx-upstream-jvm-route.tar.gz"
+#    dest: "{{ nginx_temp_installation }}"
+#    remote_src: yes
+#  tags:
+#    - package
+
+- name: apply patch of upstream jvm route to the source code of nginx
+  patch:
+    src: "{{ nginx_temp_installation }}/nginx-upstream-jvm-route/jvm_route.patch"
+    basedir: "{{ nginx_temp_installation }}/nginx-{{ nginx_main_version }}"
+    strip: 1
+    remote_src: yes
+  tags:
+    - package
+
+#- name: apply patch of upstream jvm route to the source code of nginx
+#  patch:
+#    src: "{{ nginx_temp_installation }}/nginx-upstream-jvm-route-1.12.0/jvm_route.patch"
+#    basedir: "{{ nginx_temp_installation }}/nginx-{{ nginx_main_version }}"
+#    strip: 1
+#    remote_src: yes
+#  tags:
+#    - package
+
+- name: Clone testcookie module from github
+  git:
+    repo: https://github.com/kyprizel/testcookie-nginx-module.git
+    dest: "{{ nginx_temp_installation }}/testcookie-nginx-module"
+  tags:
+    - package

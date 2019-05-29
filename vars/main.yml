@@ -1,1 +1,0 @@
-default_packages: ["wget", "gcc", "tar", "git", "automake", "pkgconfig", "unzip", "make", "gcc-c++", "autoconf", "libuuid-devel", "zlib-devel", "patch", "GeoIP", "GeoIP-data", "GeoIP-devel", "GeoIP-update", "openssl"]

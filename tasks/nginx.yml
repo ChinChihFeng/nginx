@@ -68,6 +68,7 @@
                 --with-http_realip_module \
                 --with-file-aio \
                 --with-ipv6 \
+                --with-stream \
                 --with-http_ssl_module \
                 --with-http_v2_module \
                 --without-http_browser_module \

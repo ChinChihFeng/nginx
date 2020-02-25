@@ -1,4 +1,4 @@
-FROM centos:7.5.1804
+FROM centos:7.7.1980
 
 LABEL Component="nginx" \ 
       Name="customized nginx"
@@ -16,14 +16,14 @@ RUN echo -e '[local]\nlocalhost ansible_connection=local' > /etc/ansible/hosts
 
 # Start to compile nginx by Ansible
 RUN git clone -b develop https://github.com/ChinChihFeng/nginx.git /etc/ansible/roles/nginx; \
+    #sed -i 's/1.16.0/1.17.1/g' /etc/ansible/roles/nginx/defaults/main.yml; \
     ansible-playbook /etc/ansible/roles/nginx/tests/test.yml --syntax-check; \
     ansible all -m setup -i /etc/ansible/roles/nginx/tests/inventory; \
     ansible-playbook /etc/ansible/roles/nginx/tests/test.yml
 
 #RUN ln -s /usr/local/nginx/conf.d/example.conf /usr/local/nginx/sites-enabled
-
-RUN ln -sf /dev/stdout /usr/local/nginx/logs/access.log \
-	&& ln -sf /dev/stderr /usr/local/nginx/logs/error.log
+#RUN ln -sf /dev/stdout /usr/local/nginx/logs/access.log \
+#	&& ln -sf /dev/stderr /usr/local/nginx/logs/error.log
 
 EXPOSE 80
 

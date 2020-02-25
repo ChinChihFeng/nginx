@@ -5,7 +5,7 @@ nginx_temp_installation: /tmp/nginx_installation
 
 nginx_path: /usr/local/nginx
 
-nginx_main_version: '1.16.0'
+nginx_main_version: '1.17.8'
 
 nginx_cache_path: /var/cache
 

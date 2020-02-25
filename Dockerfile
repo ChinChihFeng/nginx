@@ -1,4 +1,4 @@
-FROM centos:7.7.1980
+FROM centos:7.7.1908
 
 LABEL Component="nginx" \ 
       Name="customized nginx"
